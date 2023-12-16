@@ -275,6 +275,50 @@ public class WeatherController : ControllerBase
     } 
 }
 ```
+### 1.2 Один сервис
+- без вложенности
+```Dockerfile
+FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
+WORKDIR /app
+EXPOSE 80
+COPY *.csproj ./
+RUN dotnet restore "serviceone.csproj"
+COPY . ./
+RUN dotnet publish serviceone.csproj -c Release -o out
+FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS runtime
+WORKDIR /app
+COPY --from=build /app/out .
+ENTRYPOINT ["dotnet", "serviceone.dll"]
+```
+```docker-compose.yml
+version: '3.4'
+networks:
+  services-network:
+    driver: bridge
+  
+services:
+  serviceone:
+    container_name: serviceone
+    image: serviceone:latest
+    depends_on:
+      - "servicetwo"
+    build:
+      context: ./serviceone/serviceone
+      dockerfile: Dockerfile
+    ports:
+      - "5050:80"
+    networks:
+      - services-network
+      
+  servicetwo:
+    container_name: servicetwo
+    image: servicetwo:latest
+    build:
+      context: ./servicetwo/servicetwo
+      dockerfile: Dockerfile
+    networks:
+      - services-network
+```
 
 ## 02. MySql<a name="02"></a>
 С MySql буквально все тоже самое, меняем провайдер в .NET сервисе и заменяем постгрес на MySql в docker-compose.yml
