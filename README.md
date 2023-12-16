@@ -74,32 +74,50 @@ CREATE TABLE weather (
 INSERT INTO weather (id, name) VALUES (1, 'Пасмурно'), (2, 'Облачно');
 ```
 
-#### init.sql
+#### nginx.conf
 Файл конфигурации Nginx
 - Если нам необходим реверс прокси, создаем файл с настройками в `корне проекта (см. проект)`
-```sql
-CREATE TABLE weather (
-    id SERIAL NOT NULL,
-    name character varying NOT NULL
-);
+```nginx
+worker_processes 4;
 
-INSERT INTO weather (id, name) VALUES (1, 'Пасмурно'), (2, 'Облачно');
+events { worker_connections 1024; }
+
+http {  
+    server {
+        listen 80;
+ 
+        location /firstapi/ {
+            proxy_pass http://api_container:80/;
+        }
+        
+        location /secondapi/ {
+            proxy_pass http://apitwo_container:80/;
+        }
+    }
+}
 ```
 
 #### docker-compose.yml
 
 ```docker-compose.yml
 services:
+  # Если надо сделать с реверс прокси (если нет удаляем)
   proxy:
+    # Имя контейнера
     container_name: nginx_container
+    # Образ
     image: nginx:latest
+    # Маунтим нам конфигурационный файл
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf
+    # Внешний порт
     ports:
       - "80:80"
+    # Одна сеть между конйнерами
     networks:
       - services-network
-  
+
+  # Если надо развернуть asp.net сервис (если нет удаляем)
   api:
     container_name: api_container
     image: webapplication1
@@ -110,12 +128,15 @@ services:
       - "8080:80"
     networks:
       - services-network
+    # Не запуститься пока не стартанут это контейнеры
     depends_on:
       - "db"
       - "apitwo"
+    # Передаем переменую окружения со строкой подколючения к бд (если нет удаляем)
     environment:
       DATABASE_CONNECT: Server=postgres_container;Port=5432;Database=DataBaseName;User Id=postgres;Password=1243
 
+  # Если надо развернуть второй asp.net сервис (если нет удаляем)
   apitwo:
     container_name: apitwo_container
     image: webapplication2
@@ -125,6 +146,7 @@ services:
     networks:
       - services-network
 
+  # База данных (если нет удаляем)
   db:
     container_name: postgres_container
     image: postgres
@@ -135,13 +157,16 @@ services:
       POSTGRES_DB: DataBaseName
       PGDATA: "/var/lib/postgresql/data/pgdata"
     volumes:
+      # Маунтим init файл бд
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      # Для сохранения базы на вашем пк
       - test-data-db:/var/lib/postgresql/data
     ports:
       - "5432:5432"
     networks:
       - services-network
-  
+
+  # UI для бд (если нет удаляем)
   pgadmin:
     container_name: pgadmin_container
     image: dpage/pgadmin4:7.2
@@ -158,10 +183,12 @@ services:
     depends_on:
       - "db"
 
+# Сети для связи с контейнерами
 networks:
   services-network:
     driver: bridge
 
+# volumes верхнего уровня (именнованные), храняться на вашем пк для сохранения данных
 volumes:
   test-data-db:
   pgadmin-data:
@@ -177,6 +204,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+// Строка которую мы передали в наш сервис получаеться тут (см. проект)
 builder.Services.AddDbContext<DataBaseNameContext>(options =>
     options.UseNpgsql(Environment.GetEnvironmentVariable("DATABASE_CONNECT")));
 
