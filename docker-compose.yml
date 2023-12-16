@@ -1,0 +1,76 @@
+﻿services:
+  proxy:
+    container_name: nginx_container
+    image: nginx:latest
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    ports:
+      - "80:80"
+    networks:
+      - services-network
+  
+  api:
+    container_name: api_container
+    image: webapplication1
+    build:
+      context: .
+      dockerfile: WebApplication1/Dockerfile
+    ports:
+      - "8080:80"
+    networks:
+      - services-network
+    depends_on:
+      - "db"
+      - "apitwo"
+    environment:
+      DATABASE_CONNECT: Server=postgres_container;Port=5432;Database=DataBaseName;User Id=postgres;Password=1243
+
+  apitwo:
+    container_name: apitwo_container
+    image: webapplication2
+    build:
+      context: .
+      dockerfile: WebApplication2/Dockerfile
+    networks:
+      - services-network
+
+  db:
+    container_name: postgres_container
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1243
+      POSTGRES_DB: DataBaseName
+      PGDATA: "/var/lib/postgresql/data/pgdata"
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - test-data-db:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - services-network
+  
+  pgadmin:
+    container_name: pgadmin_container
+    image: dpage/pgadmin4:7.2
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@miit.com
+      PGADMIN_DEFAULT_PASSWORD: 1243
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+    ports:
+      - "5050:80"
+    networks:
+      - services-network
+    depends_on:
+      - "db"
+
+networks:
+  services-network:
+    driver: bridge
+
+volumes:
+  test-data-db:
+  pgadmin-data:
