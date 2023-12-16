@@ -7,9 +7,7 @@
 
 ### 1.1 Папка в папке
 Если ваш код лежит в отдельной папке с именем вашего проекта:
-![image](https://gist.github.com/assets/40522320/e2db466a-fef3-4109-a580-234b210937d0)
-
-![image](https://gist.github.com/assets/40522320/92340b4c-1802-4cf8-bb26-72216c995ccc)
+![image](https://github.com/AleksandrKonst/Administration/assets/40522320/99c8db76-0ba9-405e-9692-4d9138586933)
 
 #### Dockerfile
 Файл для вашего API
