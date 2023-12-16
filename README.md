@@ -412,3 +412,9 @@ DRIVER    VOLUME NAME
 local     myvolume1
 local     myvolume2
 ```
+#### Создание ASP проекта 
+```
+dotnet new webapi -oserviceone
+```
+
+![6oa](https://github.com/AleksandrKonst/Administration/assets/40522320/c37adf2c-221f-4c1c-8811-40ee266fc035)
