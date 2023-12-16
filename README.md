@@ -275,3 +275,30 @@ public class WeatherController : ControllerBase
     } 
 }
 ```
+
+## 02. MySql<a name="02"></a>
+С MySql буквально все тоже самое, меняем провайдер в .NET сервисе и заменяем постгрес на MySql в docker-compose.yml
+```docker-compose.yml
+mysql:
+  container_name: mysql_container
+  image: mysql
+  restart: always
+  ports:
+   - "3306:3306"
+  environment:
+    MYSQL_ROOT_PASSWORD: 1243
+    MYSQL_USER: root
+    MYSQL_PASSWORD: 1243
+    MYSQL_DATABASE: DataBaseName
+  volumes:
+   - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+# UI если надо
+adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+```
+
+## 03. Команды<a name="03"></a>
