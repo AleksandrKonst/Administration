@@ -398,7 +398,7 @@ docker image my_command
 #### Разные команды
 - `docker version` — вывод сведений о версиях клиента и сервера Docker.
 - `docker login` — вход в реестр Docker.
-- `docker system` prune — удаление неиспользуемых контейнеров, сетей и образов, которым не назначено имя и тег.
+- `docker system prune` — удаление неиспользуемых контейнеров, сетей и образов, которым не назначено имя и тег.
 
 #### Загрузить образ из удаленного
 `docker pull ubuntu` - docker pull ubuntu
