@@ -43,7 +43,8 @@ COPY --from=build /app/out .
 ENTRYPOINT ["dotnet", "WebApplication1.dll"]
 ```
 ##### Service 2
-Файл для вашего второго API. Все тоже самое.
+Файл для вашего второго API. 
+- Все тоже самое.
 ```Dockerfile
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /app
@@ -63,7 +64,19 @@ ENTRYPOINT ["dotnet", "WebApplication2.dll"]
 
 #### init.sql
 SQL файл для создания таблиц
+- Если нам необходима база данных, то мы создаем init файл в `корне проекта (см. проект)` для того чтобы создать необходимые нам таблицы и заполнить их данными
+```sql
+CREATE TABLE weather (
+    id SERIAL NOT NULL,
+    name character varying NOT NULL
+);
 
+INSERT INTO weather (id, name) VALUES (1, 'Пасмурно'), (2, 'Облачно');
+```
+
+#### init.sql
+Файл конфигурации Nginx
+- Если нам необходим реверс прокси, создаем файл с настройками в `корне проекта (см. проект)`
 ```sql
 CREATE TABLE weather (
     id SERIAL NOT NULL,
@@ -74,6 +87,7 @@ INSERT INTO weather (id, name) VALUES (1, 'Пасмурно'), (2, 'Облачн
 ```
 
 #### docker-compose.yml
+
 ```docker-compose.yml
 services:
   proxy:
