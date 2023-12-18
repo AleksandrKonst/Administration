@@ -331,11 +331,11 @@ mysql:
    - "3306:3306"
   environment:
     MYSQL_ROOT_PASSWORD: 1243
-    MYSQL_USER: root
     MYSQL_PASSWORD: 1243
     MYSQL_DATABASE: DataBaseName
   volumes:
    - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+   - ./dbdata:/var/lib/mysql/
 
 # UI если надо
 adminer:
